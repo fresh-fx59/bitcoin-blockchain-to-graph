@@ -1,0 +1,32 @@
+version: '3.9'
+services:
+
+  bbl-db-postgres:
+    image: postgres
+    container_name: bbl-db-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=bblPostgres
+      - TZ=Europe/Moscow
+    volumes:
+      - ./data/bbl-db-postgres/:/var/lib/postgresql/data
+
+  bbl-db-neo4j:
+    image: neo4j
+    container_name: bbl-db-neo4j
+    ports:
+      - "7474:7474"
+      - "7473:7473"
+      - "7687:7687"
+    environment:
+      - NEO4J_AUTH=none
+      - TZ=Europe/Moscow
+    volumes:
+      - ./data/bbl-db-neo4j/data:/data
+      - ./data/bbl-db-neo4j/logs:/logs
+      - ./data/bbl-db-neo4j/import:/var/lib/neo4j/import
+      - ./data/bbl-db-neo4j/plugins:/plugins
+      - ./data/bbl-db-neo4j/conf/:/conf/
