@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface BitcoinBlockRepository extends Neo4jRepository<BitcoinBlock, String> {
+public interface BitcoinBlockRepository extends Neo4jRepository<BitcoinBlock, Long> {
     /**
      * This repository is indirectly used in the {@code movies.spring.data.neo4j.api.MovieController} via a dedicated movie service.
      * It is not a public interface to indicate that access is either through the rest resources or through the service.

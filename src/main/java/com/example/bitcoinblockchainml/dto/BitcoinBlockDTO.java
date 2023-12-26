@@ -26,7 +26,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 public class BitcoinBlockDTO {
-    private String id;
+    private Long id;
     private String blockHash;
     private Long blockVersion;
     private String previousBlockHash;

@@ -1,6 +1,8 @@
 package com.example.bitcoinblockchainml.service.impl;
 
+import com.example.bitcoinblockchainml.config.BitcoinPeer;
 import com.example.bitcoinblockchainml.dto.BitcoinBlockDTO;
+import com.example.bitcoinblockchainml.entity.BitcoinBlock;
 import com.example.bitcoinblockchainml.mapper.BitcoinBlockMapper;
 import com.example.bitcoinblockchainml.repository.BitcoinBlockRepository;
 import com.example.bitcoinblockchainml.service.BitcoinBlockService;
@@ -21,22 +23,33 @@ import java.util.concurrent.Future;
 @Service
 public class BitcoinBlockServiceImpl implements BitcoinBlockService {
 
-    private final Peer peer;
+//    private final Peer peer;
+    //private final BitcoinPeer bitcoinPeer;
     private final BitcoinBlockMapper mapper;
+    private final BitcoinBlockRepository repository;
 
     @Override
-    public BitcoinBlockDTO downloadBlock(String blockHashParam) throws Exception {
+    public BitcoinBlockDTO getBlockFromPeer(String blockHashParam) throws Exception {
         // Retrieve a block through a peer
         Sha256Hash blockHash = Sha256Hash.wrap(blockHashParam);
-        Future<Block> future = peer.getBlock(blockHash);
-        log.info("Waiting for node to send us the requested block: " + blockHash);
-        Block block = future.get();
-        //peerGroup.stopAsync();
+        try (BitcoinPeer bitcoinPeer = new BitcoinPeer()) {
+            Future<Block> future = bitcoinPeer.getPeer().getBlock(blockHash);
+            log.info("Waiting for node to send us the requested block: " + blockHash);
+            Block block = future.get();
+            //peerGroup.stopAsync();
 
-        log.info(block.toString());
+            //log.info(block.toString());
 
-        return mapper.toDto(block);
+            return mapper.toDto(block);
+        }
     }
 
+    @Override
+    public BitcoinBlockDTO saveBlockFromPeerToDb(String blockHashParam) throws Exception {        // Retrieve a block through a peer
+        BitcoinBlockDTO blockDto = getBlockFromPeer(blockHashParam);
+        BitcoinBlock block = mapper.toEntity(blockDto);
+
+        return mapper.toDto(repository.save(block));
+    }
 
 }

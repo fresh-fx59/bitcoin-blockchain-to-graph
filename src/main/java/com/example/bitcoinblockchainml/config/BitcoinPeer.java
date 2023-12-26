@@ -16,9 +16,10 @@ import java.util.concurrent.ExecutionException;
 
 @Slf4j
 @Configuration
-public class BitcoinPeer {
+public class BitcoinPeer implements AutoCloseable {
 
-    @Bean
+    private PeerGroup peerGroup;
+
     public Peer getPeer() throws BlockStoreException, ExecutionException, InterruptedException {
         // Connect to testnet and find a peer
         log.info("Connecting to node");
@@ -26,11 +27,16 @@ public class BitcoinPeer {
         BlockStore blockStore = new MemoryBlockStore(params);
         BlockChain chain = new BlockChain(params, blockStore);
 
-        PeerGroup peerGroup = new PeerGroup(params, chain);
+        peerGroup = new PeerGroup(params, chain);
 
         peerGroup.start();
         peerGroup.waitForPeers(1).get();
 
         return peerGroup.getConnectedPeers().getFirst();
+    }
+
+    @Override
+    public void close() throws Exception {
+        peerGroup.stopAsync();
     }
 }

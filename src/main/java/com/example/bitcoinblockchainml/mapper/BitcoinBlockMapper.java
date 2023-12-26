@@ -6,7 +6,7 @@ import org.bitcoinj.core.Block;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
+@Mapper(unmappedTargetPolicy = ReportingPolicy.WARN, componentModel = "spring")
 public abstract class BitcoinBlockMapper implements EntityMapper<BitcoinBlockDTO, BitcoinBlock>{
 
     public BitcoinBlockDTO toDto(Block block) {

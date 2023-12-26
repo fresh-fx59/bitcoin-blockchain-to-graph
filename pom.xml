@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.2.0</version>
+		<version>3.2.1</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
@@ -16,9 +16,11 @@
 	<properties>
 		<java.version>21</java.version>
 		<springdoc.version>1.7.0</springdoc.version>
-		<neo4j-harness.version>5.15.0</neo4j-harness.version>
+		<neo4j.version>5.15.0</neo4j.version>
 		<bitcoinj-core.version>0.16</bitcoinj-core.version>
 		<mapstruct.version>1.5.3.Final</mapstruct.version>
+		<maven-compiler-plugin.version>3.12.1</maven-compiler-plugin.version>
+		<lombok.version>1.18.30</lombok.version>
 	</properties>
 
 	<profiles>
@@ -72,7 +74,7 @@
 		<dependency>
 			<groupId>org.neo4j.test</groupId>
 			<artifactId>neo4j-harness</artifactId>
-			<version>${neo4j-harness.version}</version>
+			<version>${neo4j.version}</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -89,7 +91,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.30</version>
+			<version>${lombok.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -97,7 +99,7 @@
 		<dependency>
 			<groupId>org.neo4j.driver</groupId>
 			<artifactId>neo4j-java-driver</artifactId>
-			<version>5.15.0</version>
+			<version>${neo4j.version}</version>
 		</dependency>
 
 <!--		<dependency>-->
@@ -134,6 +136,31 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-plugin.version}</version>
+				<configuration>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.mapstruct</groupId>
+							<artifactId>mapstruct-processor</artifactId>
+							<version>${mapstruct.version}</version>
+						</path>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>${lombok.version}</version>
+						</path>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok-mapstruct-binding</artifactId>
+							<version>0.2.0</version>
+						</path>
+					</annotationProcessorPaths>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
