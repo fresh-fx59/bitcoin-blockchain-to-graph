@@ -8,12 +8,10 @@ import com.example.bitcoinblockchainml.repository.BitcoinBlockRepository;
 import com.example.bitcoinblockchainml.service.BitcoinBlockService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bitcoinj.base.Sha256Hash;
 import org.bitcoinj.core.Block;
-import org.bitcoinj.core.Peer;
-import org.bitcoinj.core.Sha256Hash;
-import org.neo4j.driver.Driver;
-import org.springframework.data.neo4j.core.DatabaseSelectionProvider;
-import org.springframework.data.neo4j.core.Neo4jClient;
+import org.consensusj.bitcoin.json.pojo.BlockChainInfo;
+import org.consensusj.bitcoin.jsonrpc.BitcoinClient;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.Future;
@@ -23,10 +21,9 @@ import java.util.concurrent.Future;
 @Service
 public class BitcoinBlockServiceImpl implements BitcoinBlockService {
 
-//    private final Peer peer;
-    //private final BitcoinPeer bitcoinPeer;
     private final BitcoinBlockMapper mapper;
     private final BitcoinBlockRepository repository;
+    private final BitcoinClient client;
 
     @Override
     public BitcoinBlockDTO getBlockFromPeer(String blockHashParam) throws Exception {
@@ -36,12 +33,14 @@ public class BitcoinBlockServiceImpl implements BitcoinBlockService {
             Future<Block> future = bitcoinPeer.getPeer().getBlock(blockHash);
             log.info("Waiting for node to send us the requested block: " + blockHash);
             Block block = future.get();
-            //peerGroup.stopAsync();
-
-            //log.info(block.toString());
-
             return mapper.toDto(block);
         }
+    }
+
+    @Override
+    public BlockChainInfo getBlockChainInfo() throws Exception {
+        // Retrieve a block through a peer
+        return client.getBlockChainInfo();
     }
 
     @Override

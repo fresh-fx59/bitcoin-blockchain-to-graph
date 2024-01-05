@@ -30,3 +30,23 @@ services:
       - ./data/bbl-db-neo4j/import:/var/lib/neo4j/import
       - ./data/bbl-db-neo4j/plugins:/plugins
       - ./data/bbl-db-neo4j/conf/:/conf/
+
+  bbl-alpine:
+    image: alpine
+    container_name: bbl-alpine
+    command: sh
+    tty: true
+
+#  bbl-bitcoin:
+#    container_name: bbl-bitcoind
+#    user: 1000:1000
+#    image: lncm/bitcoind:v25.1-arm64v8-build49
+#    volumes:
+#      - ./data/bbl-bitcoin/bitcoin:/data/.bitcoin
+#    restart: on-failure
+#    stop_grace_period: 15m30s
+#    ports:
+#      - "8333:8333"
+#      - "8332:8332"
+#      - "28332:28332"
+#      - "28333:28333"

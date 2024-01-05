@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.consensusj.bitcoin.json.pojo.BlockChainInfo;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,5 +48,20 @@ public class BitcoinBlockController {
     public ResponseEntity<BitcoinBlockDTO> saveBlock(@PathVariable String blockHash) throws Exception {
         log.info("REST request to " + MethodLogger.getMethodName());
         return ResponseEntity.ok(service.saveBlockFromPeerToDb(blockHash));
+    }
+
+    /**
+     * Show BlockChainInfo
+     *
+     * @return BlockChainInfo
+     */
+    @Operation(summary = "Get BlockChain Info")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Get BlockChain Info")
+    })
+    @GetMapping("info")
+    public ResponseEntity<BlockChainInfo> getBlockChainInfo() throws Exception {
+        log.info("REST request to " + MethodLogger.getMethodName());
+        return ResponseEntity.ok(service.getBlockChainInfo());
     }
 }

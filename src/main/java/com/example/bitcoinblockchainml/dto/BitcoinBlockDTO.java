@@ -3,9 +3,6 @@ package com.example.bitcoinblockchainml.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import org.bitcoinj.core.Sha256Hash;
-import org.springframework.data.neo4j.core.schema.Id;
-import org.springframework.data.neo4j.core.schema.Node;
 
 import java.util.Date;
 

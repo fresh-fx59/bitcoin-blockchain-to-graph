@@ -1,15 +1,15 @@
 package com.example.bitcoinblockchainml.config;
 
 import lombok.extern.slf4j.Slf4j;
+import org.bitcoinj.base.Network;
 import org.bitcoinj.core.BlockChain;
-import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.core.Peer;
 import org.bitcoinj.core.PeerGroup;
+import org.bitcoinj.params.BitcoinNetworkParams;
 import org.bitcoinj.params.TestNet3Params;
 import org.bitcoinj.store.BlockStore;
 import org.bitcoinj.store.BlockStoreException;
 import org.bitcoinj.store.MemoryBlockStore;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.concurrent.ExecutionException;
@@ -23,11 +23,13 @@ public class BitcoinPeer implements AutoCloseable {
     public Peer getPeer() throws BlockStoreException, ExecutionException, InterruptedException {
         // Connect to testnet and find a peer
         log.info("Connecting to node");
-        final NetworkParameters params = TestNet3Params.get();
-        BlockStore blockStore = new MemoryBlockStore(params);
-        BlockChain chain = new BlockChain(params, blockStore);
+        BitcoinNetworkParams params = TestNet3Params.get();
 
-        peerGroup = new PeerGroup(params, chain);
+        final Network network = params.network();
+        BlockStore blockStore = new MemoryBlockStore(params.getGenesisBlock());
+        BlockChain chain = new BlockChain(network, blockStore);
+
+        peerGroup = new PeerGroup(network, chain);
 
         peerGroup.start();
         peerGroup.waitForPeers(1).get();
@@ -36,7 +38,7 @@ public class BitcoinPeer implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         peerGroup.stopAsync();
     }
 }

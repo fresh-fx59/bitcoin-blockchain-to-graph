@@ -8,19 +8,41 @@
 		<version>3.2.1</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
+
+	<repositories>
+		<repository>
+			<id>gitlab-maven</id>
+			<url>https://gitlab.com/api/v4/projects/8482916/packages/maven</url>
+		</repository>
+	</repositories>
+
+	<distributionManagement>
+		<repository>
+			<id>gitlab-maven</id>
+			<url>https://gitlab.com/api/v4/projects/8482916/packages/maven</url>
+		</repository>
+
+		<snapshotRepository>
+			<id>gitlab-maven</id>
+			<url>https://gitlab.com/api/v4/projects/8482916/packages/maven</url>
+		</snapshotRepository>
+	</distributionManagement>
+
 	<groupId>com.example</groupId>
 	<artifactId>bitcoin-blockchain-ml</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>bitcoin-blockchain-ml</name>
 	<description>Investigating Bitcoin blockchain</description>
+
 	<properties>
 		<java.version>21</java.version>
 		<springdoc.version>1.7.0</springdoc.version>
 		<neo4j.version>5.15.0</neo4j.version>
-		<bitcoinj-core.version>0.16</bitcoinj-core.version>
+		<bitcoinj-core.version>0.17-alpha3</bitcoinj-core.version>
 		<mapstruct.version>1.5.3.Final</mapstruct.version>
 		<maven-compiler-plugin.version>3.12.1</maven-compiler-plugin.version>
 		<lombok.version>1.18.30</lombok.version>
+		<consensusj.version>0.7.0-alpha3</consensusj.version>
 	</properties>
 
 	<profiles>
@@ -50,6 +72,12 @@
 
 
 	<dependencies>
+		<!--https://gitlab.com/ConsensusJ/consensusj/-/packages/19200815-->
+		<dependency>
+			<groupId>com.msgilligan</groupId>
+			<artifactId>cj-btc-jsonrpc</artifactId>
+			<version>${consensusj.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.mapstruct</groupId>
 			<artifactId>mapstruct</artifactId>
