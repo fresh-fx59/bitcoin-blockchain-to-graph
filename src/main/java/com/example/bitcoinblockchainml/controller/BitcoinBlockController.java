@@ -36,6 +36,21 @@ public class BitcoinBlockController {
     }
 
     /**
+     * Show block data
+     *
+     * @return retrieved BitcoinBlockDTO
+     */
+    @Operation(summary = "Get block from DB")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Получить блок из БД")
+    })
+    @GetMapping("/db/{blockHash}")
+    public ResponseEntity<BitcoinBlockDTO> getBlockFromDb(@PathVariable String blockHash) throws Exception {
+        log.info("REST request to " + MethodLogger.getMethodName());
+        return ResponseEntity.ok(service.getBlockFromDb(blockHash));
+    }
+
+    /**
      * Show saved block data
      *
      * @return saved BitcoinBlockDTO
@@ -63,5 +78,41 @@ public class BitcoinBlockController {
     public ResponseEntity<BlockChainInfo> getBlockChainInfo() throws Exception {
         log.info("REST request to " + MethodLogger.getMethodName());
         return ResponseEntity.ok(service.getBlockChainInfo());
+    }
+
+    /**
+     * Show saved block data
+     *
+     * @return saved BitcoinBlockDTO
+     */
+    @Operation(summary = "Save block by id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Get block from blockchain and save it to db")
+    })
+    @PostMapping("id/{id}")
+    public ResponseEntity<BitcoinBlockDTO> saveBlockFromClientToDb(@PathVariable Integer id) throws Exception {
+        log.info("REST request to " + MethodLogger.getMethodName());
+        return ResponseEntity.ok(service.saveBlockFromClientToDb(id));
+    }
+
+    /**
+     * Enrich block with previous block
+     *
+     * @return ok
+     */
+    @Operation(summary = "Enrich block")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Enrich block")
+    })
+    @PostMapping("enrich/hash/{hash}")
+    public ResponseEntity<BitcoinBlockDTO> enrichBlock(@PathVariable String hash) throws Exception {
+        log.info("REST request to " + MethodLogger.getMethodName());
+        return ResponseEntity.ok(service.enrichBlock(hash));
+    }
+
+    @PostMapping("load-nodes")
+    public ResponseEntity<String> loadNodes() throws Exception {
+        log.info("REST request to " + MethodLogger.getMethodName());
+        return ResponseEntity.ok(service.loadNodes());
     }
 }

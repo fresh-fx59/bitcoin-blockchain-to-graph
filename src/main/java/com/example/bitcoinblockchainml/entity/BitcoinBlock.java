@@ -14,7 +14,7 @@ import java.util.Date;
 @Node("bitcoin_block")
 public class BitcoinBlock {
     @Id
-    //@GeneratedValue
+    @GeneratedValue
     private Long id;
     private String blockHash;
     private Long blockVersion;
@@ -25,7 +25,8 @@ public class BitcoinBlock {
     private Long nonce;
     private String merkleRoot;
     private String witnessRoot;
+    private Integer blockNumber;
 
-    @Relationship(type = "BLOCK_RELATION", direction = Relationship.Direction.INCOMING)
+    @Relationship(type = "BLOCK_RELATION")
     private BitcoinBlock previousBlock;
 }

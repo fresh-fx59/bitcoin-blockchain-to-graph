@@ -20,7 +20,7 @@ public class BitcoinConfig {
         URI uri = new URI("http://localhost:18332/");
         RpcConfig config = new RpcConfig(TestNet3Params.get().network(), uri, "user", "password");
         BitcoinClient client = new BitcoinClient(config);
-        log.info(client.getBlockChainInfo().toString());
+        log.info("Blocks count " + client.getBlockChainInfo().getBlocks());
         return client;
     }
 }

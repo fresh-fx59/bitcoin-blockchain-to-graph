@@ -14,6 +14,8 @@ import org.consensusj.bitcoin.json.pojo.BlockChainInfo;
 import org.consensusj.bitcoin.jsonrpc.BitcoinClient;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.util.Optional;
 import java.util.concurrent.Future;
 
 @Slf4j
@@ -38,6 +40,15 @@ public class BitcoinBlockServiceImpl implements BitcoinBlockService {
     }
 
     @Override
+    public BitcoinBlockDTO getBlockFromDb(String blockHashParam) throws Exception {
+        // Retrieve a block through a peer
+        Sha256Hash blockHash = Sha256Hash.wrap(blockHashParam);
+        Optional<BitcoinBlock> blockFromRepo = repository.findOneByBlockHash(blockHash.toString());
+
+        return blockFromRepo.map(mapper::toDto).orElse(null);
+    }
+
+    @Override
     public BlockChainInfo getBlockChainInfo() throws Exception {
         // Retrieve a block through a peer
         return client.getBlockChainInfo();
@@ -51,4 +62,77 @@ public class BitcoinBlockServiceImpl implements BitcoinBlockService {
         return mapper.toDto(repository.save(block));
     }
 
+    @Override
+    public BitcoinBlockDTO saveBlockFromClientToDb(Integer id) throws Exception {
+        Sha256Hash blockHash = client.getBlockHash(id);
+        String blockHashString = blockHash.toString();
+
+        Optional<BitcoinBlock> blockFromRepo = repository.findOneByBlockHash(blockHashString);
+
+        if (blockFromRepo.isPresent())
+            return mapper.toDto(blockFromRepo.get());
+
+        Block block = client.getBlock(blockHash);
+        BitcoinBlock bitcoinBlock = mapper.toEntity(block);
+        return mapper.toDto(repository.save(bitcoinBlock));
+    }
+
+    @Override
+    public BitcoinBlockDTO enrichBlock(String blockHash) throws Exception {
+        BitcoinBlock initialBlock = saveAndGetBitcoinBlockByHash(blockHash);
+
+        BitcoinBlock previousBlock = saveAndGetBitcoinBlockByHash(initialBlock.getPreviousBlockHash());
+
+        initialBlock.setPreviousBlock(previousBlock);
+
+        return mapper.toDto(initialBlock);
+    }
+
+    private BitcoinBlock saveAndGetBitcoinBlockByHash(String blockHash) throws IOException {
+        Optional<BitcoinBlock> blockFromRepo = repository.findOneByBlockHash(blockHash);
+
+        return blockFromRepo.orElseGet(() -> {
+            try {
+                return saveAndGetBlock(blockHash);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    private BitcoinBlock saveAndGetBlock(String blockHash) throws IOException {
+        Block block = client.getBlock(Sha256Hash.wrap(blockHash));
+        BitcoinBlock bitcoinBlock = mapper.toEntity(block);
+        return repository.save(bitcoinBlock);
+    }
+
+    @Override
+    public String loadNodes() throws IOException {
+        Integer blocksCount = client.getBlockChainInfo().getBlocks();
+        Integer maxBlockNumberFromDb = repository.findMaxBlockNumber();
+        int startingBlock = maxBlockNumberFromDb != null ? maxBlockNumberFromDb + 1 : 0;
+
+        if (maxBlockNumberFromDb != null) {
+            if (blocksCount.compareTo(maxBlockNumberFromDb) == 0) {
+                return "All blocks are loaded";
+            } else if (blocksCount.compareTo(maxBlockNumberFromDb) < 0) {
+                return "Something went wrong blocksCount " + blocksCount + " is less than maxBlockNumberFromDb " + maxBlockNumberFromDb;
+            }
+        }
+
+        for (int i = startingBlock; i <= blocksCount; i++) {
+            String hash = String.valueOf(client.getBlockHash(i));
+            Block block;
+            try {
+                block = client.getBlock(Sha256Hash.wrap(hash));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            BitcoinBlock bitcoinBlock = mapper.toEntity(block);
+            bitcoinBlock.setBlockNumber(i);
+            repository.save(bitcoinBlock);
+        }
+
+        return "done";
+    }
 }

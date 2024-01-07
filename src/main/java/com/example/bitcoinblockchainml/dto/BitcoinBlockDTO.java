@@ -32,4 +32,6 @@ public class BitcoinBlockDTO {
     private Long nonce;
     private String merkleRoot;
     private String witnessRoot;
+    private Integer blockNumber;
+    private BitcoinBlockDTO previousBlock;
 }
