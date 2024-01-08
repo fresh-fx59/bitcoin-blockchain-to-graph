@@ -4,4 +4,4 @@ You need docker to run neo4j database, intellij idea to run the program and bitc
 
 ## Bitcoin Core Settings
 
-Tick _Enable RPC server_ checkbox and use _bitcoincore.conf_ file for configuration. About 50Gb of free space required for test blockchain.
+Tick _Enable RPC server_ checkbox and use _bitcoin.conf_ file for configuration. About 50Gb of free space required for test blockchain.
