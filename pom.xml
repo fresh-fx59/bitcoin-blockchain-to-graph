@@ -29,9 +29,9 @@
 	</distributionManagement>
 
 	<groupId>com.example</groupId>
-	<artifactId>bitcoin-blockchain-ml</artifactId>
+	<artifactId>bitcoin-blockchain-to-graph</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>bitcoin-blockchain-ml</name>
+	<name>bitcoin-blockchain-to-graph</name>
 	<description>Investigating Bitcoin blockchain</description>
 
 	<properties>
