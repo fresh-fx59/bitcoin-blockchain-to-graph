@@ -34,17 +34,6 @@
 	<name>bitcoin-blockchain-to-graph</name>
 	<description>Investigating Bitcoin blockchain</description>
 
-	<properties>
-		<java.version>21</java.version>
-		<springdoc.version>1.7.0</springdoc.version>
-		<neo4j.version>5.15.0</neo4j.version>
-		<bitcoinj-core.version>0.17-alpha3</bitcoinj-core.version>
-		<mapstruct.version>1.5.3.Final</mapstruct.version>
-		<maven-compiler-plugin.version>3.12.1</maven-compiler-plugin.version>
-		<lombok.version>1.18.30</lombok.version>
-		<consensusj.version>0.7.0-alpha3</consensusj.version>
-	</properties>
-
 	<profiles>
 		<profile>
 			<id>local</id>
@@ -70,8 +59,45 @@
 		</profile>
 	</profiles>
 
+	<properties>
+		<java.version>21</java.version>
+		<springdoc.version>1.7.0</springdoc.version>
+		<neo4j.version>5.15.0</neo4j.version>
+		<bitcoinj-core.version>0.17-alpha3</bitcoinj-core.version>
+		<mapstruct.version>1.5.3.Final</mapstruct.version>
+		<maven-compiler-plugin.version>3.12.1</maven-compiler-plugin.version>
+		<lombok.version>1.18.30</lombok.version>
+		<consensusj.version>0.7.0-alpha3</consensusj.version>
+		<liquibase-core.version>4.25.1</liquibase-core.version>
+		<commons-collections4.version>4.4</commons-collections4.version>
+	</properties>
 
 	<dependencies>
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-collections4 -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-collections4</artifactId>
+			<version>${commons-collections4.version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.liquibase/liquibase-core -->
+		<dependency>
+			<groupId>org.liquibase</groupId>
+			<artifactId>liquibase-core</artifactId>
+			<version>${liquibase-core.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
 		<!--https://gitlab.com/ConsensusJ/consensusj/-/packages/19200815-->
 		<dependency>
 			<groupId>com.msgilligan</groupId>
@@ -129,21 +155,16 @@
 			<artifactId>neo4j-java-driver</artifactId>
 			<version>${neo4j.version}</version>
 		</dependency>
-
-<!--		<dependency>-->
-<!--			<groupId>org.springframework.boot</groupId>-->
-<!--			<artifactId>spring-boot-starter-data-jpa</artifactId>-->
-<!--		</dependency>-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-neo4j</artifactId>
 		</dependency>
 
-<!--		<dependency>-->
-<!--			<groupId>org.postgresql</groupId>-->
-<!--			<artifactId>postgresql</artifactId>-->
-<!--			<scope>runtime</scope>-->
-<!--		</dependency>-->
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>runtime</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
