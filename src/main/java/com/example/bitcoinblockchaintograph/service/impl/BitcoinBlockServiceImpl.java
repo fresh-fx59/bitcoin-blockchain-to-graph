@@ -3,29 +3,87 @@ package com.example.bitcoinblockchaintograph.service.impl;
 import com.example.bitcoinblockchaintograph.config.BitcoinPeer;
 import com.example.bitcoinblockchaintograph.dto.BitcoinBlockDTO;
 import com.example.bitcoinblockchaintograph.entity.neo4j.BitcoinBlock;
+import com.example.bitcoinblockchaintograph.exception.BitcoinBlockException;
 import com.example.bitcoinblockchaintograph.mapper.BitcoinBlockMapper;
 import com.example.bitcoinblockchaintograph.repository.neo4j.BitcoinBlockRepository;
+import com.example.bitcoinblockchaintograph.service.BitcoinBlockInitialDataService;
 import com.example.bitcoinblockchaintograph.service.BitcoinBlockService;
+import com.example.bitcoinblockchaintograph.service.TransactionalService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.bitcoinj.base.Sha256Hash;
 import org.bitcoinj.core.Block;
 import org.consensusj.bitcoin.json.pojo.BlockChainInfo;
 import org.consensusj.bitcoin.jsonrpc.BitcoinClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import static com.example.bitcoinblockchaintograph.entity.enumeration.BlockStatus.HEADER_SAVED;
+import static com.example.bitcoinblockchaintograph.util.BatchTool.getBatchedLists;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class BitcoinBlockServiceImpl implements BitcoinBlockService {
+    @Value("${batch.parallelism}")
+    private int parallelism;
 
     private final BitcoinBlockMapper mapper;
     private final BitcoinBlockRepository repository;
+    private final BitcoinBlockInitialDataService bitcoinBlockInitialDataService;
     private final BitcoinClient client;
+    private final TransactionalService transactionalService;
+
+    @Override
+    public void loadNotLoadedBlocks() {
+        List<String> hashesToLoad = new ArrayList<>(bitcoinBlockInitialDataService.getNotLoadedHashes());
+        Set<String> loadedHashes = repository.findAllBlocksHashes();
+
+        Collection<String> intersectionOfHashes = CollectionUtils.intersection(hashesToLoad, loadedHashes);
+
+        if (!CollectionUtils.isEmpty(intersectionOfHashes)) {
+            hashesToLoad.removeAll(loadedHashes);
+            bitcoinBlockInitialDataService.updateBlocksStatus(intersectionOfHashes, HEADER_SAVED);
+        }
+
+        int batchSize = 1000;
+
+        if (CollectionUtils.isEmpty(hashesToLoad))
+            return;
+
+        List<List<String>> batchedHashes = getBatchedLists(hashesToLoad, batchSize);
+
+        try (ExecutorService customThreadPool = Executors.newFixedThreadPool(parallelism)) {
+            customThreadPool.submit(() -> batchedHashes.parallelStream().forEach(this::processHashes));
+        }
+    }
+
+    private void processHashes(Collection<String> hashes) {
+        List<BitcoinBlock> listOfBlocks = new ArrayList<>();
+        String firstHashInBlocks = hashes.stream()
+                .findFirst()
+                .orElseThrow(() -> new BitcoinBlockException("Failed to process BitcoinBlock. Hashes are empty."));
+
+        hashes.forEach(hash -> {
+            try {
+                Block block = client.getBlock(Sha256Hash.wrap(hash));
+                listOfBlocks.add(mapper.toEntity(block));
+            } catch (IOException e) {
+                throw new BitcoinBlockException("Failed to process BitcoinBlock hashes " + firstHashInBlocks);
+            }
+        });
+
+        transactionalService.saveBitcoinBlocksAndUpdateStatuses(listOfBlocks, hashes);
+
+        log.info("Batch {} done", firstHashInBlocks);
+    }
 
     @Override
     public BitcoinBlockDTO getBlockFromPeer(String blockHashParam) throws Exception {

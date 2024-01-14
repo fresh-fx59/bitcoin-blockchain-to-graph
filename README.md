@@ -13,3 +13,7 @@ This the link where you can find dockerized neo4j http://localhost:7474/browser/
 ## Postman
 
 [Link](https://www.postman.com/freshfx59/workspace/bitcoin-blockchain-ml-application/collection/18379597-930dc347-13a9-46eb-9880-b52d25ed1989?action=share&creator=18379597) to collection in postman to test APIs 
+
+### Useful links
+
+[Multiple DataSources and Neo4j](https://louisjj.medium.com/multiple-datasources-for-springboot-neo4j-4-x-mysql-920727dfbb80)

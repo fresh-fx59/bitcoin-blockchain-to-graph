@@ -10,7 +10,6 @@ import java.text.NumberFormat;
 
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
 public class BitcoinBlockchainToGraphApplication {
-
 	private static Log logger = LogFactory.getLog(BitcoinBlockchainToGraphApplication.class);
 
 	public static void main(String[] args) {

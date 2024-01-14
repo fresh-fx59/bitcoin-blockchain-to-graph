@@ -110,9 +110,25 @@ public class BitcoinBlockController {
         return ResponseEntity.ok(service.enrichBlock(hash));
     }
 
+    /**
+     * Start loading blocks data to graph DB
+     *
+     * @return ok
+     */
+    @Operation(summary = "Load blocks")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Start loading blocks data to graph DB")
+    })
     @PostMapping("load-nodes")
     public ResponseEntity<String> loadNodes() throws Exception {
         log.info("REST request to " + MethodLogger.getMethodName());
-        return ResponseEntity.ok(service.loadNodes());
+        service.loadNotLoadedBlocks();
+        return ResponseEntity.ok().build();
     }
+
+//    @PostMapping("load-nodes")
+//    public ResponseEntity<String> loadNodes() throws Exception {
+//        log.info("REST request to " + MethodLogger.getMethodName());
+//        return ResponseEntity.ok(service.loadNodes());
+//    }
 }
